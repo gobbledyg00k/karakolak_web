@@ -9,9 +9,9 @@ from flask import Flask, send_from_directory, send_file, request, jsonify, rende
 # host = rospy.get_param('~host', '0.0.0.0')
 # www_path = rospy.get_param('~path','../web')
 
-host = 'localhost'
+host = '0.0.0.0'
 port = 8080
-# os.system("ustreamer --device=/dev/video1 --host=0.0.0.0 --port=9999") #добавить ./ustreamer в path
+os.system("ustreamer --device=/dev/video0 --host=0.0.0.0 --port=9999 &") #add ./ustreamer to path
 time.sleep(3)
 
 app = Flask(__name__, static_folder='../web' + '/static', template_folder='../web')
