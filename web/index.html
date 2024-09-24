@@ -94,7 +94,7 @@
     <div class="container">
         <!-- Видеопоток -->
         <div class="video-stream">
-            <img src="http://192.168.0.13:9999/stream" width="640" height="480" />
+            <img src="http://{{ros_host}}:9999/stream" width="640" height="480" />
         </div>
 
         <!-- Информационная панель -->
@@ -136,6 +136,26 @@
     <script src="./static/js/keyboardteleop.js"></script>
 
     <script>
+	var ros = new ROSLIB.Ros({
+           url : 'ws://{{ros_host}}:9090'
+    	});
+
+	// ros.connect('ws://localhost:9090');
+
+	ros.on('error', function(error) {
+	console.log('Error connecting to websocket server: ', error);
+	});
+	
+	var speed = new ROSLIB.Topic({
+    	ros : ros,
+    	name : '/speed',
+   	messageType : 'Int16MultiArray'
+  	});
+	
+	var msg = {
+		data : [1,1,1,1,1,1,1,1,1,11,1,1]
+	};
+
         // Функция для обновления отображаемой скорости
         function updateSpeedValue() {
             const speedSlider = document.getElementById('speed');
@@ -147,7 +167,8 @@
         document.addEventListener('keydown', function(event) {
             if (['q', 'w', 'e', 'a', 's', 'd'].includes(event.key.toLowerCase())) {
                 document.getElementById('key' + event.key.toUpperCase()).classList.add('pressed');
-            }
+                speed.publish(msg);
+		}
         });
 
         document.addEventListener('keyup', function(event) {

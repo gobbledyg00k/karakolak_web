@@ -1,9 +1,9 @@
-# import rospy
+import rospy
 
 import os, signal, sys, time
 from flask import Flask, send_from_directory, send_file, request, jsonify, render_template
 
-# rospy.init_node('webserver', anonymous=True)
+rospy.init_node('webserver', anonymous=True)
 
 # port = rospy.get_param('~port', 8080)
 # host = rospy.get_param('~host', '0.0.0.0')
@@ -28,7 +28,7 @@ def on_exit(sig, func=None):
 def server_index():
     ip_address = request.host.split(':')[0]
     return render_template('index.html',
-            # ros_host = ip_address,
+            ros_host = ip_address,
             # ros_robot = os.uname()[1]
             )
 
