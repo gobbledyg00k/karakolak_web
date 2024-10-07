@@ -41,13 +41,13 @@
                     <table>
                         <tbody>
                             <tr>
-                                <td id="w1">0</td>
+                                <td id="w1">0.0</td>
                             </tr>
                             <tr>
-                                <td id="w3">0</td>
+                                <td id="w3">0.0</td>
                             </tr>
                             <tr>
-                                <td id="w5">0</td>
+                                <td id="w5">0.0</td>
                             </tr>
                         </tbody>
                     </table>
@@ -59,13 +59,13 @@
                     <table>
                         <tbody>
                             <tr>
-                                <td id="w2">0</td>
+                                <td id="w2">0.0</td>
                             </tr>
                             <tr>
-                                <td id="w4">0</td>
+                                <td id="w4">0.0</td>
                             </tr>
                             <tr>
-                                <td id="w6">0</td>
+                                <td id="w6">0.0</td>
                             </tr>
                         </tbody>
                     </table>
@@ -83,7 +83,6 @@
     <script src="./static/js/jquery-3.7.0.slim.min.js"></script>
     <script src="./static/js/eventemitter2.min.js"></script>
     <script src="./static/js/roslib.min.js"></script>
-    <script src="./static/js/keyboardteleop.js"></script>
 
     <script>
         var ros = new ROSLIB.Ros({
@@ -193,18 +192,18 @@
 
         var listener = new ROSLIB.Topic({
             ros: ros,
-            name: '/listener',
+            name: '/encoders',
             messageType: 'Float32MultiArray'
         });
 
         // Then we add a callback to be called every time a message is published on this topic.
         listener.subscribe(function (message) {
-            document.getElementById("w1").textContent = String(message.data[0]);
-            document.getElementById("w2").textContent = String(message.data[1]);
-            document.getElementById("w3").textContent = String(message.data[2]);
-            document.getElementById("w4").textContent = String(message.data[3]);
-            document.getElementById("w5").textContent = String(message.data[4]);
-            document.getElementById("w6").textContent = String(message.data[5]);
+            document.getElementById("w1").textContent = String(message.data[0].toFixed(1));
+            document.getElementById("w2").textContent = String(message.data[1].toFixed(1));
+            document.getElementById("w3").textContent = String(message.data[2].toFixed(1));
+            document.getElementById("w4").textContent = String(message.data[3].toFixed(1));
+            document.getElementById("w5").textContent = String(message.data[4].toFixed(1));
+            document.getElementById("w6").textContent = String(message.data[5].toFixed(1));
             console.log('Received message on ' + listener.name + ': ' + message.data);
         });
     </script>
