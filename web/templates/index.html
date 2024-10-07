@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rover</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/icon.png') }}" />
+</head>
+
+<body>
+    <div class="container">
+        <!-- Видеопоток -->
+        <div class="video-stream">
+            <img src="http://{{ros_host}}:9999/stream" width="640" height="480" />
+        </div>
+
+        <!-- Информационная панель -->
+        <div class="info-panel">
+            <h2>Информация</h2>
+
+            <!-- Индикация нажатий клавиш -->
+            <div class="key-indicator">
+                <span id="key81">Q</span>
+                <span id="key87">W</span>
+                <span id="key69">E</span>
+                <span id="key65">A</span>
+                <span id="key83">S</span>
+                <span id="key68">D</span>
+            </div>
+
+            <!-- Ползунок для задания скорости -->
+            <div class="slider">
+                <label for="speed">Скорость: <span id="speed-value">50%</span></label>
+                <input type="range" id="speed" min="0" max="100" value="50" oninput="updateSpeedValue()">
+            </div>
+
+            <div class="visual">
+                <div class="visual-col">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td id="w1">0.0</td>
+                            </tr>
+                            <tr>
+                                <td id="w3">0.0</td>
+                            </tr>
+                            <tr>
+                                <td id="w5">0.0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="visual-pic">
+                    <img class="pic" src="../static/img/rover.png" />
+                </div>
+                <div class="visual-col">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td id="w2">0.0</td>
+                            </tr>
+                            <tr>
+                                <td id="w4">0.0</td>
+                            </tr>
+                            <tr>
+                                <td id="w6">0.0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Поле для вывода пройденного расстояния -->
+                <div class="output-info">
+                    Пройденное расстояние: <span id="distance">0 км</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Подключение JS библиотек -->
+    <script src="./static/js/jquery-3.7.0.slim.min.js"></script>
+    <script src="./static/js/eventemitter2.min.js"></script>
+    <script src="./static/js/roslib.min.js"></script>
+
+    <script>
+        var ros = new ROSLIB.Ros({
+              url : 'ws://{{ros_host}}:9090'
+        	});
+
+        ros.connect('ws://localhost:9090');
+
+        ros.on('error', function(error) {
+        console.log('Error connecting to websocket server: ', error);
+        });
+
+        var speed = new ROSLIB.Topic({
+        	ros : ros,
+        	name : '/speed',
+        messageType : 'Int16MultiArray'
+        });
+
+        var speedSliderValue = 50;
+
+        // Функция для обновления отображаемой скорости
+        function updateSpeedValue() {
+            const speedSlider = document.getElementById('speed');
+            const speedValue = document.getElementById('speed-value');
+            speedSliderValue = Number(speedSlider.value);
+            speedValue.textContent = speedSlider.value + '%';
+        }
+
+        // Обработчик для индикации нажатий клавиш W, A, S, D
+        document.addEventListener('keydown', function (event) {
+            if ([65, 68, 69, 81, 83, 87].includes(event.keyCode)) {
+                document.getElementById('key' + String(event.keyCode)).classList.add('pressed');
+            }
+            switch (event.keyCode) {
+                case 87:
+                    var msg = {
+                        data: [
+                            1 * speedSliderValue,
+                            1 * speedSliderValue,
+                            1 * speedSliderValue,
+                            1 * speedSliderValue,
+                            1 * speedSliderValue,
+                            1 * speedSliderValue,
+                            0, 0, 0, 0, 0, 0]
+                    };
+                    console.log(msg);
+                    speed.publish(msg);
+                    break;
+                case 83:
+                    var msg = {
+                        data: [
+                            -1 * speedSliderValue,
+                            -1 * speedSliderValue,
+                            -1 * speedSliderValue,
+                            -1 * speedSliderValue,
+                            -1 * speedSliderValue,
+                            -1 * speedSliderValue,
+                            0, 0, 0, 0, 0, 0]
+                    };
+                    console.log(msg);
+                    speed.publish(msg);
+                    break;
+                case 65:
+                    var msg = {
+                        data: [
+                            -1 * speedSliderValue,
+                            1 * speedSliderValue,
+                            -1 * speedSliderValue,
+                            1 * speedSliderValue,
+                            -1 * speedSliderValue,
+                            1 * speedSliderValue,
+                            0, 0, 0, 0, 0, 0]
+                    };
+                    console.log(msg);
+                    speed.publish(msg);
+                    break;
+                case 68:
+                    var msg = {
+                        data: [
+                            1 * speedSliderValue,
+                            -1 * speedSliderValue,
+                            1 * speedSliderValue,
+                            -1 * speedSliderValue,
+                            1 * speedSliderValue,
+                            -1 * speedSliderValue,
+                            0, 0, 0, 0, 0, 0]
+                    };
+                    console.log(msg);
+                    speed.publish(msg);
+                    break;
+                default:
+            }
+        });
+
+        document.addEventListener('keyup', function (event) {
+            if ([65, 68, 69, 81, 83, 87].includes(event.keyCode)) {
+                document.getElementById('key' + String(event.keyCode)).classList.remove('pressed');
+                var msg = {
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                };
+                console.log(msg);
+                speed.publish(msg);
+            }
+        });
+
+        var wheelRPM = [0, 0, 0, 0];
+
+        var listener = new ROSLIB.Topic({
+            ros: ros,
+            name: '/encoders',
+            messageType: 'Float32MultiArray'
+        });
+
+        // Then we add a callback to be called every time a message is published on this topic.
+        listener.subscribe(function (message) {
+            document.getElementById("w1").textContent = String(message.data[0].toFixed(1));
+            document.getElementById("w2").textContent = String(message.data[1].toFixed(1));
+            document.getElementById("w3").textContent = String(message.data[2].toFixed(1));
+            document.getElementById("w4").textContent = String(message.data[3].toFixed(1));
+            document.getElementById("w5").textContent = String(message.data[4].toFixed(1));
+            document.getElementById("w6").textContent = String(message.data[5].toFixed(1));
+            console.log('Received message on ' + listener.name + ': ' + message.data);
+        });
+    </script>
+</body>
+
+</html>
