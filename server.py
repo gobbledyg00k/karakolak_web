@@ -1,20 +1,21 @@
-import rospy
+#import rospy
 
 import os, signal, sys, time
 from flask import Flask, send_from_directory, send_file, request, jsonify, render_template
 
-rospy.init_node('webserver', anonymous=True)
+#rospy.init_node('webserver', anonymous=True)
 
-port = rospy.get_param('~port', 8080)
-host = rospy.get_param('~host', '0.0.0.0')
-www_path = rospy.get_param('~path','../web')
+#port = rospy.get_param('~port', 8080)
+#host = rospy.get_param('~host', '0.0.0.0')
+#www_path = rospy.get_param('~path','../web')
 
 host = '0.0.0.0'
 port = 8080
-os.system("ustreamer --device=/dev/video0 --host=0.0.0.0 --port=9999 &") #add ./ustreamer to path
+os.system("ustreamer --device=/dev/video0 --desired-fps=15 --host=0.0.0.0 --port=9998 &")
+os.system("ustreamer --device=/dev/video2 --desired-fps=30 --host=0.0.0.0 --port=9999 &")
 # time.sleep(3)
 
-app = Flask(__name__, static_folder='../web' + '/static', template_folder='../web' + '/templates')
+app = Flask(__name__, static_folder='web' + '/static', template_folder='web' + '/templates')
 
 def set_exit_handler(func):
     signal.signal(signal.SIGTERM, func)

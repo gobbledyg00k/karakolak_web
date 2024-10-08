@@ -13,7 +13,8 @@
     <div class="container">
         <!-- Видеопоток -->
         <div class="video-stream">
-            <img src="http://{{ros_host}}:9999/stream" width="640" height="480" />
+            <img src="http://192.168.0.9:9998/stream" />
+            <img src="http://192.168.0.9:9999/stream" />
         </div>
 
         <!-- Информационная панель -->
@@ -86,19 +87,19 @@
 
     <script>
         var ros = new ROSLIB.Ros({
-              url : 'ws://{{ros_host}}:9090'
-        	});
+            url: 'ws://{{ros_host}}:9090'
+        });
 
         ros.connect('ws://localhost:9090');
 
-        ros.on('error', function(error) {
-        console.log('Error connecting to websocket server: ', error);
+        ros.on('error', function (error) {
+            console.log('Error connecting to websocket server: ', error);
         });
 
         var speed = new ROSLIB.Topic({
-        	ros : ros,
-        	name : '/speed',
-        messageType : 'Int16MultiArray'
+            ros: ros,
+            name: '/speed',
+            messageType: 'Int16MultiArray'
         });
 
         var speedSliderValue = 50;
